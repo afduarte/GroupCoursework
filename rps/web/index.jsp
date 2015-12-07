@@ -15,7 +15,11 @@
   <div class="container">
       <div class="row">
           <div class="col-md-8 col-md-push-2">
-              <p class="center-block">Hello World!!!</p>
+              <div class="row">
+                  <div class="col-md-6 col-md-push-3">
+                      <h1>Rock, Paper, Scissors xTreme</h1>
+                  </div>
+              </div>
           </div>
       </div>
   </div>
