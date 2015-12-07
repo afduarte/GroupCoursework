@@ -24,6 +24,9 @@
         <label for="limit">Limit:</label>
         <input type="number" min="10" max="1000" name="limit" id="limit" required value="200">
 
+        <label for="cheat">Cheat?</label>
+        <input type="checkbox" name="cheat" id="cheat">
+
         <input type="submit">
     </form>
 </body>

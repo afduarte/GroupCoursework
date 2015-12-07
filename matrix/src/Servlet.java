@@ -46,6 +46,10 @@ public class Servlet extends HttpServlet {
                 set = "abcdefghijklmnopqrstxyzw";
             }
 
+            if (Boolean.valueOf(request.getParameter("cheat"))) {
+                set = word + word + set + word + word;
+            }
+
             if (! error.equals("")) {
                 request.getRequestDispatcher("/form.jsp").forward(request, response);
             } else {
