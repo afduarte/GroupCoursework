@@ -21,46 +21,71 @@ public class Matrix {
         this.highlight = Color.white;
     }
 
-    public Gif89Encoder findWord(String word) throws IOException{
+    public Gif89Encoder findWord(String word, Integer limit, Integer interval) throws IOException{
 
         Gif89Encoder genc = new Gif89Encoder();
 
-        Boolean run = true;
-        while (run) {
-            Integer width = this.cols * 16 + 2*16;
-            Integer height = this.rows * 20 + 2*5;
+        Boolean found = false;
+        Integer i = 0;
+        Integer width = this.cols * 16 + 2*16;
+        Integer height = (this.rows+1) * 20 + 2*5;
+        while (!found && i < limit) {
             BufferedImage image = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = image.createGraphics();
             g.setColor(this.bg);
             g.fillRect(0,0,width, height);
             g.setColor(this.font);
             g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
-            run = ! this.drawFrame(g, word);
+            found = this.drawFrame(g, word, i++);
             genc.addFrame(image);
             g.dispose();
-
         }
 
-        genc.setUniformDelay(10);
-        genc.setLoopCount(0);
+        if (!found) {
+            BufferedImage image = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = image.createGraphics();
+
+            g.setColor(this.bg);
+            g.fillRect(0,0,width, height);
+            g.setColor(this.font);
+            g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
+            g.drawString("Could not find a result in " + limit + " iterations.", 0,20);
+            genc.addFrame(image);
+        }
+
+        genc.setUniformDelay(interval);
+        genc.setLoopCount(1);
 
         return genc;
     }
 
+    private Color getRandomColorBrightness(Color color) {
+        Integer r = new Random().nextInt(3);
 
-    private Boolean drawFrame(Graphics2D g, String highlight) {
+        if (r.equals(0)) {
+            return color;
+        }
+
+        if (r.equals(1)) {
+            return color.brighter();
+        }
+
+        return color.darker();
+    }
+
+
+    private Boolean drawFrame(Graphics2D g, String highlight, Integer iteration) {
         Boolean found = false;
         for (Integer row = 1; row <= this.rows; row++) {
             g.translate(0, 20);
             String line = this.getRandomLine();
             Integer startHighlight = line.indexOf(highlight);
-
             Integer endHighlight = startHighlight + highlight.length();
             for (Integer col = 0; col < line.length(); col++) {
-                if (!found && startHighlight.equals(col)) {
-                    g.setColor(this.highlight);
-                } else if (endHighlight.equals(col)) {
-                    g.setColor(this.font);
+                if (startHighlight != -1 && !found && startHighlight <= col && endHighlight > col) {
+                    g.setColor(this.getRandomColorBrightness(this.highlight));
+                } else {
+                    g.setColor(this.getRandomColorBrightness(this.font));
                 }
 
                 g.drawString(String.valueOf(line.charAt(col)), (col+1)*16, 0);
@@ -71,7 +96,10 @@ public class Matrix {
                 found = true;
             }
         }
+        g.translate(0, 20);
 
+        g.setColor(this.font);
+        g.drawString("Iteration:" + iteration, 0, 0);
         return found;
     }
 
