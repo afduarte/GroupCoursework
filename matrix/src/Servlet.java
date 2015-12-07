@@ -11,6 +11,7 @@ public class Servlet extends HttpServlet {
         String set;
         Integer columns;
         Integer rows;
+        Integer limit;
         String error = "";
         request.setAttribute("error", error);
 
@@ -19,6 +20,7 @@ public class Servlet extends HttpServlet {
                 error = "You must set the word to look for.";
             }
             set = request.getParameter("set");
+            limit = Integer.parseInt(request.getParameter("limit"));
 
             if (null == request.getParameter("cols")) {
                 columns = 10;
@@ -49,7 +51,7 @@ public class Servlet extends HttpServlet {
             } else {
                 Matrix matrix = new Matrix(set, rows, columns);
                 response.setContentType("image/gif");
-                matrix.findWord(word).encode(response.getOutputStream());
+                matrix.findWord(word, limit).encode(response.getOutputStream());
             }
         } else {
             request.getRequestDispatcher("/form.jsp").forward(request, response);

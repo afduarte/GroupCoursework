@@ -15,10 +15,14 @@
         <input type="text" name="set" id="set" value="abcdefghijklmnopqrstuvwxyz" required/>
 
         <label for="cols">Columns:</label>
-        <input type="number" min="1" max="1000" name="cols" id="cols" required value="200">
+        <input type="number" min="1" max="150" name="cols" id="cols" required value="40">
 
         <label for="rows">Rows:</label>
-        <input type="number" min="1" max="1000" name="rows" id="rows" required value="200">
+        <input type="number" min="1" max="150" name="rows" id="rows" required value="20">
+
+
+        <label for="limit">Limit:</label>
+        <input type="number" min="10" max="1000" name="limit" id="limit" required value="200">
 
         <input type="submit">
     </form>
