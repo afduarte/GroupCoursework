@@ -10,11 +10,17 @@
 
       <title>Rock, Paper, Scissors Extreme</title>
   </head>
+
   <body>
-  $END$
+  <div class="container">
+      <div class="row">
+          <div class="col-md-8 col-md-push-2">
+              <p class="center-block">Hello World!!!</p>
+          </div>
+      </div>
+  </div>
 
 
-  
   <!-- jQuery -->
   <script src="js/jquery.js"></script>
 
