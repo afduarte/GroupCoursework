@@ -30,7 +30,7 @@
 
         <br>
         <label for="cheat">Cheat?</label>
-        <input type="checkbox" name="cheat" id="cheat">
+        <input type="checkbox" name="cheat" id="cheat" value="true">
 
         <br>
 
