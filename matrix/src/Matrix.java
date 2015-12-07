@@ -21,7 +21,7 @@ public class Matrix {
         this.highlight = Color.white;
     }
 
-    public Gif89Encoder findWord(String word, Integer limit) throws IOException{
+    public Gif89Encoder findWord(String word, Integer limit, Integer interval) throws IOException{
 
         Gif89Encoder genc = new Gif89Encoder();
 
@@ -44,6 +44,7 @@ public class Matrix {
         if (!found) {
             BufferedImage image = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = image.createGraphics();
+
             g.setColor(this.bg);
             g.fillRect(0,0,width, height);
             g.setColor(this.font);
@@ -52,10 +53,24 @@ public class Matrix {
             genc.addFrame(image);
         }
 
-        genc.setUniformDelay(5);
+        genc.setUniformDelay(interval);
         genc.setLoopCount(1);
 
         return genc;
+    }
+
+    private Color getRandomColorBrightness(Color color) {
+        Integer r = new Random().nextInt(3);
+
+        if (r.equals(0)) {
+            return color;
+        }
+
+        if (r.equals(1)) {
+            return color.brighter();
+        }
+
+        return color.darker();
     }
 
 
@@ -64,14 +79,13 @@ public class Matrix {
         for (Integer row = 1; row <= this.rows; row++) {
             g.translate(0, 20);
             String line = this.getRandomLine();
-            g.setColor(this.font);
             Integer startHighlight = line.indexOf(highlight);
             Integer endHighlight = startHighlight + highlight.length();
             for (Integer col = 0; col < line.length(); col++) {
-                if (!found && startHighlight.equals(col)) {
-                    g.setColor(this.highlight);
-                } else if (endHighlight.equals(col)) {
-                    g.setColor(this.font);
+                if (startHighlight != -1 && !found && startHighlight <= col && endHighlight > col) {
+                    g.setColor(this.getRandomColorBrightness(this.highlight));
+                } else {
+                    g.setColor(this.getRandomColorBrightness(this.font));
                 }
 
                 g.drawString(String.valueOf(line.charAt(col)), (col+1)*16, 0);
@@ -84,6 +98,7 @@ public class Matrix {
         }
         g.translate(0, 20);
 
+        g.setColor(this.font);
         g.drawString("Iteration:" + iteration, 0, 0);
         return found;
     }

@@ -12,6 +12,7 @@ public class Servlet extends HttpServlet {
         Integer columns;
         Integer rows;
         Integer limit;
+        Integer interval;
         String error = "";
         request.setAttribute("error", error);
 
@@ -21,6 +22,7 @@ public class Servlet extends HttpServlet {
             }
             set = request.getParameter("set");
             limit = Integer.parseInt(request.getParameter("limit"));
+            interval = Integer.parseInt(request.getParameter("interval"));
 
             if (null == request.getParameter("cols")) {
                 columns = 10;
@@ -55,7 +57,7 @@ public class Servlet extends HttpServlet {
             } else {
                 Matrix matrix = new Matrix(set, rows, columns);
                 response.setContentType("image/gif");
-                matrix.findWord(word, limit).encode(response.getOutputStream());
+                matrix.findWord(word, limit, interval).encode(response.getOutputStream());
             }
         } else {
             request.getRequestDispatcher("/form.jsp").forward(request, response);

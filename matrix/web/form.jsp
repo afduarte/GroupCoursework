@@ -20,12 +20,19 @@
         <label for="rows">Rows:</label>
         <input type="number" min="1" max="150" name="rows" id="rows" required value="20">
 
-
+        <br>
         <label for="limit">Limit:</label>
         <input type="number" min="10" max="1000" name="limit" id="limit" required value="200">
 
+
+        <label for="interval">Interval:</label>
+        <input type="number" min="1" max="50" name="interval" id="interval" required value="5">
+
+        <br>
         <label for="cheat">Cheat?</label>
         <input type="checkbox" name="cheat" id="cheat">
+
+        <br>
 
         <input type="submit">
     </form>
