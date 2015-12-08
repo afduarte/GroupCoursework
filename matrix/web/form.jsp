@@ -15,10 +15,24 @@
         <input type="text" name="set" id="set" value="abcdefghijklmnopqrstuvwxyz" required/>
 
         <label for="cols">Columns:</label>
-        <input type="number" min="1" max="1000" name="cols" id="cols" required value="200">
+        <input type="number" min="1" max="150" name="cols" id="cols" required value="40">
 
         <label for="rows">Rows:</label>
-        <input type="number" min="1" max="1000" name="rows" id="rows" required value="200">
+        <input type="number" min="1" max="150" name="rows" id="rows" required value="20">
+
+        <br>
+        <label for="limit">Limit:</label>
+        <input type="number" min="10" max="1000" name="limit" id="limit" required value="200">
+
+
+        <label for="interval">Interval:</label>
+        <input type="number" min="1" max="50" name="interval" id="interval" required value="5">
+
+        <br>
+        <label for="cheat">Cheat?</label>
+        <input type="checkbox" name="cheat" id="cheat" value="true">
+
+        <br>
 
         <input type="submit">
     </form>
