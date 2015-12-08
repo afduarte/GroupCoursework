@@ -9,6 +9,10 @@ import java.io.IOException;
 public class Servlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        request.getRequestDispatcher("/index.jsp").forward(request, response);
+        if(request.getParameter("game") ==null || request.getParameter("difficulty") ==null)
+            request.getRequestDispatcher("/index.jsp").forward(request, response);
+        else{
+            int game = Integer.parseInt(request.getParameter("game"));
+        }
     }
 }
