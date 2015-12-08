@@ -13,15 +13,20 @@
 
   <body>
   <div class="container">
-      <div class="row">
-          <div class="col-md-8 col-md-push-2">
+      <form>
+          <div class="row">
               <div class="row">
                   <div class="col-md-6 col-md-push-3">
                       <h1>Rock, Paper, Scissors xTreme</h1>
                   </div>
               </div>
+              <div class="row">
+                  <div class="col-md-4 col-md-push-4">
+                      <input class="btn btn-primary" name="game" type="button"  value="3"/>
+                  </div>
+              </div>
           </div>
-      </div>
+      </form>
   </div>
 
 

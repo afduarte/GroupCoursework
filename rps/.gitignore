@@ -1,7 +1,5 @@
 *.class
 
-ou/
-
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
@@ -62,3 +60,4 @@ local.properties
 
 # STS (Spring Tool Suite)
 .springBeans
+out/
