@@ -2,7 +2,10 @@ import net.jmge.gif.Gif89Encoder;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 import static java.lang.Math.pow;
 
@@ -38,6 +41,27 @@ public class Matrix {
         Integer height = (this.rows+1) * 20 + 2*5;
         String powResult = getExponential(word.length(),charSet.length);
         Font defFont = new Font(Font.MONOSPACED, Font.PLAIN, 16);
+        ArrayList<Integer> indexes = new ArrayList<>();
+
+        IntStream.range(1,this.cols+1).forEach(x -> indexes.add(x));
+        Collections.shuffle(indexes);
+
+
+        for(Integer j = 1; j <= rows+cols+2; j++)
+        {
+            BufferedImage image = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = image.createGraphics();
+            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+            g.setColor(this.bg);
+            g.fillRect(0,0,width, height);
+            g.setFont(defFont);
+            this.drawIntro(g,j,indexes);
+            genc.addFrame(image);
+            g.dispose();
+        }
+
+
         while (!found && i < limit) {
             BufferedImage image = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = image.createGraphics();
@@ -105,7 +129,7 @@ public class Matrix {
                     else
                         g.setColor(this.font);
                     if(this.variableSize)
-                        g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, randomSize()));
+                        g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, randomSize(15,5)));
                 }
                 g.drawString(String.valueOf(line.charAt(col)), (col+1)*16, 0);
 
@@ -126,7 +150,7 @@ public class Matrix {
     protected String getRandomLine() {
         String line = "";
         for (Integer col = 0; col < this.cols; col++) {
-            line += charSet[new Random().nextInt(this.charSet.length)];
+            line += charSet[randomSize(this.charSet.length,0)];
         }
 
         return line;
@@ -138,10 +162,31 @@ public class Matrix {
             return res.toString()+"!";
     }
 
-    Integer randomSize()
+    Integer randomSize(Integer value, Integer offset)
     {
         Random rand = new Random();
-        return rand.nextInt(15)+5;
+        return rand.nextInt(value)+offset;
+    }
+
+    void drawIntro(Graphics2D g, Integer iterations,ArrayList<Integer> indexes)
+    {
+        for(Integer i: indexes)
+        {
+            g.translate(i*16,0);
+            for(Integer j = 1; j<iterations; j++)
+            {
+
+                g.setColor(Color.green);
+                String entry = "" + charSet[randomSize(this.charSet.length,0)];
+                if(this.variableSize)
+                    g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, randomSize(15,5)));
+                if(variableIntensity)
+                    g.setColor(this.getRandomColorBrightness(this.font));
+                g.drawString(entry,0,0);
+                g.translate(0,20);
+            }
+            g.translate(-i*16,-iterations*20);
+        }
     }
 
 }
