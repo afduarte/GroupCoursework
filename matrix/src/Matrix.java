@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Random;
 
+import static java.lang.Math.pow;
+
 public class Matrix {
     char[] charSet;
     Integer rows;
@@ -11,14 +13,19 @@ public class Matrix {
     Color bg;
     Color font;
     Color highlight;
+    Boolean variableSize = true;
+    Boolean variableIntensity = true;
 
-    public Matrix(String chars, Integer rows, Integer cols) {
+    public Matrix(String chars, Integer rows, Integer cols,
+                  Color fgColor, Color bgColor, Boolean variableSize, Boolean variableIntensity) {
         this.charSet = chars.toCharArray();
         this.rows = rows;
         this.cols = cols;
-        this.bg = Color.BLACK;
-        this.font = Color.green;
+        this.bg = bgColor;
+        this.font = fgColor;
         this.highlight = Color.white;
+        this.variableSize = variableSize;
+        this.variableIntensity = variableIntensity;
     }
 
     public Gif89Encoder findWord(String word, Integer limit, Integer interval) throws IOException{
@@ -29,14 +36,18 @@ public class Matrix {
         Integer i = 0;
         Integer width = this.cols * 16 + 2*16;
         Integer height = (this.rows+1) * 20 + 2*5;
+        String powResult = getExponential(word.length(),charSet.length);
+        Font defFont = new Font(Font.MONOSPACED, Font.PLAIN, 16);
         while (!found && i < limit) {
             BufferedImage image = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = image.createGraphics();
+            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
             g.setColor(this.bg);
             g.fillRect(0,0,width, height);
             g.setColor(this.font);
-            g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
-            found = this.drawFrame(g, word, i++);
+            g.setFont(defFont);
+            found = this.drawFrame(g, word, i++,defFont);
             genc.addFrame(image);
             g.dispose();
         }
@@ -44,12 +55,15 @@ public class Matrix {
         if (!found) {
             BufferedImage image = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = image.createGraphics();
-
+            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
             g.setColor(this.bg);
             g.fillRect(0,0,width, height);
             g.setColor(this.font);
             g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
-            g.drawString("Could not find a result in " + limit + " iterations.", 0,20);
+            g.drawString(" Could not find a result in " + limit + " iterations.", 0,20);
+            g.drawString(" The chances of finding a word of length "+word.length(),0, 80);
+            g.drawString(" with an alphabet of size "+this.charSet.length+" are only 1 on " + powResult,0, 100);
             genc.addFrame(image);
         }
 
@@ -74,7 +88,7 @@ public class Matrix {
     }
 
 
-    private Boolean drawFrame(Graphics2D g, String highlight, Integer iteration) {
+    private Boolean drawFrame(Graphics2D g, String highlight, Integer iteration,Font defFont) {
         Boolean found = false;
         for (Integer row = 1; row <= this.rows; row++) {
             g.translate(0, 20);
@@ -83,11 +97,16 @@ public class Matrix {
             Integer endHighlight = startHighlight + highlight.length();
             for (Integer col = 0; col < line.length(); col++) {
                 if (startHighlight != -1 && !found && startHighlight <= col && endHighlight > col) {
-                    g.setColor(this.getRandomColorBrightness(this.highlight));
+                    g.setColor(this.highlight);
+                    g.setFont(defFont);
                 } else {
-                    g.setColor(this.getRandomColorBrightness(this.font));
+                    if(variableIntensity)
+                        g.setColor(this.getRandomColorBrightness(this.font));
+                    else
+                        g.setColor(this.font);
+                    if(this.variableSize)
+                        g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, randomSize()));
                 }
-
                 g.drawString(String.valueOf(line.charAt(col)), (col+1)*16, 0);
 
             }
@@ -99,6 +118,7 @@ public class Matrix {
         g.translate(0, 20);
 
         g.setColor(this.font);
+        g.setFont(defFont);
         g.drawString("Iteration:" + iteration, 0, 0);
         return found;
     }
@@ -110,6 +130,18 @@ public class Matrix {
         }
 
         return line;
+    }
+
+    String getExponential(Integer exp, Integer base)
+    {
+            Double res = pow(base,exp);
+            return res.toString()+"!";
+    }
+
+    Integer randomSize()
+    {
+        Random rand = new Random();
+        return rand.nextInt(15)+5;
     }
 
 }
