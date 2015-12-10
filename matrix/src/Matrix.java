@@ -45,7 +45,7 @@ public class Matrix {
         this.displayIterations = displayIterations;
         try {
             this.matrixFont = Font.createFont(Font.TRUETYPE_FONT,
-                    new File("C:\\Users\\Elohimir\\Documents\\GitHub\\SD1-GCW\\matrix\\web\\matrixFont.ttf")); //TODO fix catalina wd
+                    new File(".." + File.separator + "fonts" + File.separator + "matrixFont.ttf"));
         } catch (FontFormatException | IOException e) {
             matrixFont = new Font(Font.MONOSPACED,Font.PLAIN,16);
             e.printStackTrace();
@@ -53,7 +53,7 @@ public class Matrix {
         matrixFont = matrixFont.deriveFont(16f);
         try {
             this.matrixCode = Font.createFont(Font.TRUETYPE_FONT,
-                    new File("C:\\Users\\Elohimir\\Documents\\GitHub\\SD1-GCW\\matrix\\web\\matrix-code.ttf")); //TODO fix catalina wd
+                    new File(".." + File.separator + "fonts" + File.separator + "matrix-code.ttf"));
         } catch (FontFormatException | IOException e) {
             matrixCode = new Font(Font.MONOSPACED,Font.PLAIN,16);
             e.printStackTrace();

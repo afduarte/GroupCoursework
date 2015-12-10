@@ -21,7 +21,7 @@
 
         <p>- The number of Columns and Rows must be at least 1<br>
             - You always need at least a word to find<br>
-            - The number of Columns must always be equal to the length of the word.<br>
+            - The number of Columns must always be equal or greater than the length of the word.<br>
             - If the set of characters doesn't include all the characters of your word,<br>
               you are not going to find much!</p>
 
