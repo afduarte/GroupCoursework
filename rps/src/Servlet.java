@@ -4,10 +4,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Random;
 
 public class Servlet extends HttpServlet {
     RPS rps = new RPS();
 
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        rps.game=0;
+        response.sendRedirect("Servlet");
+    }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
@@ -15,7 +20,8 @@ public class Servlet extends HttpServlet {
             response.setContentType("text/html");
             PrintWriter out = response.getWriter();
             printIndex(out);
-        }else{
+        }else if(request.getParameter("symbol")==null){
+
             if(request.getParameter("game")!=null)
                 rps.game = Integer.parseInt(request.getParameter("game"));
 
@@ -23,6 +29,40 @@ public class Servlet extends HttpServlet {
             System.arraycopy(rps.general, 0, symbols, 0, rps.game);
             PrintWriter out = response.getWriter();
             printMove(out, symbols, rps.game);
+
+        }else if(rps.game!=0 && request.getParameter("symbol")!=null){
+            String user = request.getParameter("symbol");
+            response.setContentType("text/html");
+            PrintWriter out = response.getWriter();
+            out.println("<html><body>");
+            String comp = rps.general[randInt(0,rps.game)];
+            int outcome = getOutcome(user,comp);
+            out.println("<h1>OUTCOME: "+outcome+"</h1>");
+            out.println("<p>Match was:"+user+" VS "+comp+"</p>");
+            out.println("<br>");
+            if (outcome == 1) {
+                out.println("YOU WIN");
+            } else if (outcome == 0) {
+                out.println("ITS A DRAW");
+            } else if (outcome == -1) {
+                out.println("YOU LOSE");
+
+            } else {
+                out.println("ERROR");
+            }
+            //TODO: FIX LABEL (CSS)
+            // TODO: CREATE TABLE STRUCTURE
+            // TODO: INTEGRATE GIF ANIMATION
+            // TODO: CHANGE RANDOM METHOD TO CHANGE ODDS (GET NUMBER FROM 0-300, 0-500 0-700)
+            printExplanation(out,rps.game);
+            out.println("<form method=\"POST\">");
+            out.println("<label>");
+            out.println("<input type=\"submit\"/>");
+            out.println("<img src=\"img/buttons/start.png\">");
+            out.println("</label>");
+            out.println("</form>");
+            out.println("</body></html>");
+
 
 
         }
@@ -35,7 +75,7 @@ public class Servlet extends HttpServlet {
         out.println("<style>");
         out.println("label> input { visibility: hidden; position: absolute;}");
         out.println("label> input + img{ cursor:pointer; border:2px solid transparent; height: 50px;}");
-        out.println("label> input:hover + img{ border:5px solid transparent; }");
+        out.println("label> input:not(:checked):hover + img{ border:5px solid transparent; }");
         out.println("label> input:checked + img{ height: 75px;}");
         out.println("td{ width: 140px; height: 100px; text-align: center;}");
         out.println("</style>");
@@ -87,7 +127,7 @@ public class Servlet extends HttpServlet {
         out.println("<style>");
         out.println("label> input { visibility: hidden; position: absolute;}");
         out.println("label> input + img{ cursor:pointer; border:2px solid transparent; height: 50px;}");
-        out.println("label> input:hover + img{ border:5px solid transparent; }");
+        out.println("label> input:not(:checked):hover + img{ border:5px solid transparent; }");
         out.println("label> input:checked + img{ height: 75px;}");
         out.println("td{ width: 140px; height: 100px; text-align: center; }");
         out.println("</style>");
@@ -122,5 +162,96 @@ public class Servlet extends HttpServlet {
         out.println("</tbody>");
         out.println("</table>");
         out.println("</body>");
+    }
+
+    public void printExplanation(PrintWriter out, int game){
+
+        if(game==3){
+            out.println("<p>");
+            out.println("<font color=\"00bb00\"><b>ROCK</b></font> CRUSHES <font color=\"brown\"><b>SCISSORS</b></font>.<br>");
+            out.println("<font color=\"purple\"><b>PAPER</b></font> COVERS <font color=\"00bb00\"><b>ROCK</b></font>.<br>");
+            out.println("<font color=\"brown\"><b>SCISSORS</b></font> CUT <font color=\"purple\"><b>PAPER</b></font>.<br>");
+            out.println("</p>");
+        }else if(game==5){
+            out.println("<p>");
+            out.println("<font color=\"00bb00\"><b>ROCK</b></font> POUNDS OUT<font color=\"dddd00\"><b> FIRE</b></font>&amp; CRUSHES <font color=\"brown\"><b>SCISSORS</b></font>.<br>");
+            out.println("<font color=\"purple\"><b>PAPER</b></font> COVERS <font color=\"00bb00\"><b>ROCK</b></font>, FLOATS ON <font color=\"0000bb\"><b>WATER</b></font>.<br>");
+            out.println("<font color=\"brown\"><b>SCISSORS</b></font> CUT <font color=\"purple\"><b>PAPER</b></font> &amp; <font color=\"ff5555\"><b>SPONGE</b></font>.<br>");
+            out.println("<font color=\"dddd00\"><b>FIRE</b></font> MELTS <font color=\"brown\"><b>SCISSORS</b></font>&amp; BURNS <font color=\"purple\"><b>PAPER</b></font>.<br>");
+            out.println("<font color=\"0000bb\"><b>WATER</b></font> ERODES <font color=\"00bb00\"><b>ROCK</b></font>&amp; PUTS OUT<font color=\"dddd00\"><b> FIRE</b></font>.");
+            out.println("</p>");
+        }else if(game==7){
+            out.println("<p>");
+            out.println("<font color=\"00bb00\"><b>ROCK</b></font> POUNDS OUT<font color=\"dddd00\"><b>FIRE</b></font>, CRUSHES <font color=\"brown\"><b>SCISSORS</b></font> &amp;<font color=\"ff5555\"><b>SPONGE</b></font>.<br>");
+            out.println("<font color=\"purple\"><b>PAPER</b></font> FANS <font color=\"5555ff\"><b>AIR</b></font>, COVERS <font color=\"00bb00\"><b>ROCK</b></font>, FLOATS ON <font color=\"0000bb\"><b>WATER</b></font>.<br>");
+            out.println("<font color=\"brown\"><b>SCISSORS</b></font> SWISH THROUGH <font color=\"5555ff\"><b>AIR</b></font>, CUT <font color=\"purple\"><b>PAPER</b></font> &amp; <font color=\"ff5555\"><b>SPONGE</b></font>.<br>");
+            out.println("<font color=\"dddd00\"><b>FIRE</b></font> MELTS <font color=\"brown\"><b>SCISSORS</b></font>, BURNS <font color=\"purple\"><b>PAPER</b></font> &amp; <font color=\"ff5555\"><b>SPONGE</b></font>.<br>");
+            out.println("<font color=\"0000bb\"><b>WATER</b></font> ERODES <font color=\"00bb00\"><b>ROCK</b></font>, PUTS OUT<font color=\"dddd00\"><b>FIRE</b></font>, RUSTS <font color=\"brown\"><b>SCISSORS</b></font>.");
+            out.println("<font color=\"ff5555\"><b>SPONGE</b></font> SOAKS <font color=\"purple\"><b>PAPER</b></font>, USES <font color=\"5555ff\"><b>AIR</b></font> POCKETS, ABSORBS <font color=\"0000bb\"><b>WATER</b></font>.<br>");
+            out.println("<font color=\"5555ff\"><b>AIR</b></font> BLOWS OUT <font color=\"dddd00\"><b>FIRE</b></font>, ERODES <font color=\"00bb00\"><b>ROCK</b></font>, EVAPORATES <font color=\"0000bb\"><b>WATER</b></font>.<br>");
+            out.println("</p>");
+        }
+    }
+
+
+    private int randInt(int min, int max) {
+            Random r = new Random();
+            min++;
+            int result = r.nextInt(max - min) + min;
+            return result;
+
+    }
+
+    private int getOutcome(String user, String comp) {
+
+        if (user.equals(comp))
+            return 0;
+
+        switch (user) {
+            case "rock":
+                if("scissors".equals(comp) || "fire".equals(comp) || "sponge".equals(comp))
+                    return (1);
+                else
+                    return (-1);
+
+            case "paper":
+                if("air".equals(comp) || "water".equals(comp) || "rock".equals(comp) )
+                    return (1);
+                else
+                    return (-1);
+
+            case "scissors":
+                if("sponge".equals(comp) || "paper".equals(comp) || "air".equals(comp) )
+                    return (1);
+                else
+                    return (-1);
+
+            case "water":
+                if("rock".equals(comp) || "fire".equals(comp) || "scissors".equals(comp))
+                    return (1);
+                else
+                    return (-1);
+
+            case "air":
+                if("water".equals(comp) || "fire".equals(comp) || "rock".equals(comp))
+                    return (1);
+                else
+                    return (-1);
+
+            case "sponge":
+                if("paper".equals(comp) || "air".equals(comp) || "water".equals(comp))
+                    return (1);
+                else
+                    return (-1);
+
+            case "fire":
+                if("sponge".equals(comp) || "paper".equals(comp) || "scissors".equals(comp))
+                    return (1);
+                else
+                    return (-1);
+
+            default:
+                return 0;
+        }
     }
 }
