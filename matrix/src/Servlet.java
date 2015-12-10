@@ -20,6 +20,9 @@ public class Servlet extends HttpServlet {
         Boolean variableJam = false;
         Boolean variableSize = false;
         Boolean dispIterations = false;
+        Boolean dispIntro = false;
+        Boolean dispOutro = false;
+        Boolean dispResults = false;
         request.setAttribute("error", error);
 
         if (null != word) {
@@ -82,6 +85,16 @@ public class Servlet extends HttpServlet {
                 dispIterations = true;
             }
 
+            if (Boolean.valueOf(request.getParameter("intro"))) {
+                dispIntro = true;
+            }
+            if (Boolean.valueOf(request.getParameter("outro"))) {
+                dispOutro = true;
+            }
+            if (Boolean.valueOf(request.getParameter("results"))) {
+                dispResults = true;
+            }
+
             if( "0".equals(request.getParameter("radios"))){
                 variableSize = false;
                 variableJam = false;
@@ -100,7 +113,8 @@ public class Servlet extends HttpServlet {
             if (! error.equals("")) {
                 request.getRequestDispatcher("/form.jsp").forward(request, response);
             } else {
-                Matrix matrix = new Matrix(set, rows, columns, fgColor, bgColor,variableSize, variableJam,dispIterations);
+                Matrix matrix = new Matrix(set, rows, columns, fgColor, bgColor,variableSize,
+                        variableJam,dispIterations,dispIntro,dispOutro,dispResults);
                 response.setContentType("image/gif");
                 matrix.findWord(word, limit, interval).encode(response.getOutputStream());
             }

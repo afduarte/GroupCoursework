@@ -20,12 +20,16 @@ public class Matrix {
     Boolean variableSize;
     Boolean charJam;
     Boolean displayIterations;
+    Boolean intro;
+    Boolean outro;
+    Boolean results;
     Font defFont;
     Font matrixFont = null;
     Font matrixCode = null;
 
-    public Matrix(String chars, Integer rows, Integer cols, Color fgColor,
-                  Color bgColor, Boolean variableSize, Boolean charJam, Boolean displayIterations) {
+    public Matrix(String chars, Integer rows, Integer cols, Color fgColor, Color bgColor,
+                  Boolean variableSize, Boolean charJam, Boolean displayIterations, Boolean intro,
+                  Boolean outro, Boolean results) {
         this.charSet = chars.toCharArray();
         this.rows = rows;
         this.cols = cols;
@@ -35,10 +39,13 @@ public class Matrix {
         this.variableSize = variableSize;
         this.charJam = charJam;
         this.defFont = new Font(Font.MONOSPACED, Font.PLAIN, 16);
+        this.intro = intro;
+        this.outro = outro;
+        this.results = results;
         this.displayIterations = displayIterations;
         try {
             this.matrixFont = Font.createFont(Font.TRUETYPE_FONT,
-                    new File("C:\\Users\\Elohimir\\Documents\\GitHub\\SD1-GCW\\matrix\\web\\matrixFont.ttf")); //TODO fix this shit
+                    new File("C:\\Users\\Elohimir\\Documents\\GitHub\\SD1-GCW\\matrix\\web\\matrixFont.ttf")); //TODO fix catalina wd
         } catch (FontFormatException | IOException e) {
             matrixFont = new Font(Font.MONOSPACED,Font.PLAIN,16);
             e.printStackTrace();
@@ -46,7 +53,7 @@ public class Matrix {
         matrixFont = matrixFont.deriveFont(16f);
         try {
             this.matrixCode = Font.createFont(Font.TRUETYPE_FONT,
-                    new File("C:\\Users\\Elohimir\\Documents\\GitHub\\SD1-GCW\\matrix\\web\\matrix-code.ttf")); //TODO fix this shit
+                    new File("C:\\Users\\Elohimir\\Documents\\GitHub\\SD1-GCW\\matrix\\web\\matrix-code.ttf")); //TODO fix catalina wd
         } catch (FontFormatException | IOException e) {
             matrixCode = new Font(Font.MONOSPACED,Font.PLAIN,16);
             e.printStackTrace();
@@ -70,18 +77,21 @@ public class Matrix {
         Collections.shuffle(indexes);
 
 
-        for(Integer j = 1; j <= rows+cols+2; j++)
+        if(intro)
         {
-            BufferedImage image = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = image.createGraphics();
-            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-            g.setColor(this.bg);
-            g.fillRect(0,0,width, height);
-            g.setFont(this.defFont);
-            this.drawIntro(g,j,indexes);
-            genc.addFrame(image);
-            g.dispose();
+            for(Integer j = 1; j <= rows+cols+2; j++)
+            {
+                BufferedImage image = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g = image.createGraphics();
+                g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                        RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+                g.setColor(this.bg);
+                g.fillRect(0,0,width, height);
+                g.setFont(this.defFont);
+                this.drawInOut(g,j,indexes,0,20);
+                genc.addFrame(image);
+                g.dispose();
+            }
         }
 
 
@@ -102,17 +112,48 @@ public class Matrix {
             g.dispose();
         }
 
-        if (!found) {
-            BufferedImage image = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = image.createGraphics();
-            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-            g.setColor(this.bg);
-            g.fillRect(0,0,width, height);
+        if(outro)
+        {
+            for(Integer j = this.cols; j >0; j--)
+            {
+                BufferedImage image = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g = image.createGraphics();
+                g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                        RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+                g.setColor(this.bg);
+                g.fillRect(0,0,width, height);
+                g.setFont(this.defFont);
+                this.drawInOut(g,j,indexes,height,-20);
+                genc.addFrame(image);
+                g.dispose();
+            }
+        }
+
+
+        BufferedImage image = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = image.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+        g.setColor(this.bg);
+        g.fillRect(0,0,width, height);
+        if(results)
+        {
             g.setColor(this.font);
-            g.drawString(" Could not find a result in " + limit + " iterations.", 0,20);
-            g.drawString(" The chances of finding a word of length "+word.length(),0, 80);
-            g.drawString(" with an alphabet of size "+this.charSet.length+" are only 1 in " + powResult,0, 100);
+            if (!found) {
+                g.setFont(matrixFont);
+                g.drawString("SORRY!",(cols*8)-30,40);
+                g.setFont(defFont);
+                g.drawString(" Could not find a result in " + limit + " iterations.", 70,110);
+            }
+            else
+            {
+                g.setFont(matrixFont);
+                g.drawString("FOUND!",(cols*8)-30,40);
+                g.setFont(defFont);
+                g.drawString(" Result found in " + limit + " iterations.", 70,110);
+            }
+            g.drawString(" The chances to generate the word '" + word + "' of length "+word.length(),70, 150);
+            g.drawString(" with an alphabet of size "+this.charSet.length+" are only 1 in " + powResult,70, 190);
             genc.addFrame(image);
             g.dispose();
         }
@@ -186,27 +227,32 @@ public class Matrix {
         return rand.nextInt(value)+offset;
     }
 
-    void drawIntro(Graphics2D g, Integer iterations,ArrayList<Integer> indexes)
+
+    void drawInOut(Graphics2D g, Integer iterations,ArrayList<Integer> indexes,
+                   Integer vertStart, Integer vertDelta)
     {
+        g.translate(0,vertStart);
         for(Integer i: indexes)
         {
             g.translate(i*16,0);
             for(Integer j = 1; j<iterations; j++)
             {
-                g.setColor(Color.green);
+                g.setColor(this.font);
                 String entry = "" + charSet[randomSize(this.charSet.length,0)];
                 if(this.variableSize)
                     g.setFont(new Font("matrixCode", Font.PLAIN, randomSize(15,5)));
                 if(this.charJam)
                     g.setFont(this.matrixCode);
-                if(j == iterations || j == iterations -1)
-                    g.setColor(Color.white);
+                if(j == iterations -1)
+                    if(vertDelta>0)
+                        g.setColor(Color.white);
                 g.drawString(entry,0,0);
-                g.translate(0,20);
+                g.translate(0,vertDelta);
             }
-            g.translate(-i*16,-iterations*20);
+            g.translate(-i*16,-iterations*vertDelta);
         }
     }
+
 
     void randomFont(Graphics2D g)
     {

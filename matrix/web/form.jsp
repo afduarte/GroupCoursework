@@ -4,31 +4,11 @@
 <head>
     <title>Matrix</title>
     <link href="style.css" rel="stylesheet" type="text/css"/>
-    <script type="text/javascript" src="jquery-1.9.1.min.js"></script>
-    <script type="text/javascript" src="jquery.simple-color.js"></script>
-    <script  type="text/javascript">
-        $(document).ready(function(){
-            $('.simple_color_live_preview').simpleColor({ livePreview: true,
-                displayColorCode: true});
-
-            $('.simple_color_callback').simpleColor({
-                onSelect: function(hex, element) {
-                    alert("You selected #" + hex + " for input #" + element.attr('class'));
-                }
-            });
-
-            $('.simple_color_mouse_enter').simpleColor({
-                onCellEnter: function(hex, element) {
-                    console.log("You just entered #" + hex + " for input #" + element.attr('class'));
-                }
-            });
-        });
-    </script>
 </head>
 <body>
 <form>
 
-    <h1>THE MATRIX</h1>
+    <h1>THE MATRIX - DIGITAL RAIN</h1>
 
     <h3>You take the blue pill, the story ends here, you wake
         up and believe whatever you want to believe. You take
@@ -41,7 +21,9 @@
 
         <p>- The number of Columns and Rows must be at least 1<br>
             - You always need at least a word to find<br>
-            - The number of Columns must always be equal to the length of the word.</p>
+            - The number of Columns must always be equal to the length of the word.<br>
+            - If the set of characters doesn't include all the characters of your word,<br>
+              you are not going to find much!</p>
 
         <% if (! request.getAttribute("error").equals("")) %>
         <p style="color: red"><%= request.getAttribute("error") %></p>
@@ -101,6 +83,13 @@
             <input type="checkbox" name="iters" id="iters" value="true">
             <label for="cheat">Cheat?</label>
             <input type="checkbox" name="cheat" id="cheat" value="true">
+            <br>
+            <label for="intro">Show Intro</label>
+            <input type="checkbox" name="intro" id="intro" value="true" checked>
+            <label for="outro">Show Outro</label>
+            <input type="checkbox" name="outro" id="outro" value="true" checked>
+            <label for="results">Show Results</label>
+            <input type="checkbox" name="results" id="results" value="true" checked>
             <br>
             <label for="standard">Standard Text</label>
             <input type="radio" name="radios" id="standard" value="0" checked>

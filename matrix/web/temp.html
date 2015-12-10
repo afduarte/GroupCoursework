@@ -41,16 +41,18 @@
 
         <p>- The number of Columns and Rows must be at least 1<br>
             - You always need at least a word to find<br>
-            - The number of Columns must always be equal to the length of the word.</p>
+            - The number of Columns must always be equal to the length of the word.<br>
+            - If the set of characters doesn't include all the characters of your word,<br>
+            you are not going to find much!</classp>
 
         <% if (! request.getAttribute("error").equals("")) %>
         <p style="color: red"><%= request.getAttribute("error") %></p>
         <label for="word">Word to look for:</label>
-        <input type="text" name="word" id="word" size="50" required/>
+        <input class="key" type="text" name="word" id="word" size="50" required/>
         <br><br><br>
 
         <label for="set">Character set to rotate:</label>
-        <input type="text" name="set" id="set" value="abcdefghijklmnopqrstuvwxyz" size="30" required/>
+        <input class="set" type="text" name="set" id="set" value="abcdefghijklmnopqrstuvwxyz" size="30" required/>
 
         <br><br>
 
@@ -64,12 +66,12 @@
         <div id="sizes">
             <label for="cols">Columns:</label>
             <br>
-            <input type="number" min="<%= getColumnSize(request.getParameter("word")+1)%>"
+            <input class="cls" type="number" min="<%= getColumnSize(request.getParameter("word")+1)%>"
             max="150" name="cols" id="cols" required value="40" size = "10">
             <br>
             <label for="rows">Rows:</label>
             <br>
-            <input type="number" min="1" max="150" name="rows" id="rows" required value="20">
+            <input class="rws" type="number" min="1" max="150" name="rows" id="rows" required value="20">
         </div>
 
         <br><br>
@@ -102,17 +104,24 @@
             <label for="cheat">Cheat?</label>
             <input type="checkbox" name="cheat" id="cheat" value="true">
             <br>
-            <label for="standard">Character Jam?</label>
-            <input type="radio" name="radios" id="standard" value="0">
-            <label for="varsize">Variable Size?</label>
+            <label for="intro">Show Intro</label>
+            <input type="checkbox" name="intro" id="intro" value="true" checked>
+            <label for="intro">Show Outro</label>
+            <input type="checkbox" name="outro" id="outro" value="true" checked>
+            <label for="intro">Show Results</label>
+            <input type="checkbox" name="results" id="results" value="true" checked>
+            <br>
+            <label for="standard">Standard Text</label>
+            <input type="radio" name="radios" id="standard" value="0" checked>
+            <label for="varsize">Variable Char Size</label>
             <input type="radio" name="radios" id="varsize" value="1">
-            <label for="varJam">Character Jam?</label>
+            <label for="varJam">Character Jam</label>
             <input type="radio" name="radios" id="varJam" value="2">
             <br><br>
         </div>
 
         <div id="button">
-            <button type="submit" name="submit" value="submit">Take the Red Pill</button>
+            <button type="submit" data-tooltip="fakkayu" name="submit" value="submit">Take the Red Pill</button>
         </div>
     </div>
 </form>
