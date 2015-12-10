@@ -11,6 +11,8 @@ public class Servlet extends HttpServlet {
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         rps.game=0;
+        if(request.getParameter("reset")!=null)
+            rps.reset();
         response.sendRedirect("Servlet");
     }
 
@@ -34,31 +36,46 @@ public class Servlet extends HttpServlet {
             String user = request.getParameter("symbol");
             response.setContentType("text/html");
             PrintWriter out = response.getWriter();
-            out.println("<html><body>");
-            String comp = rps.general[randInt(0,rps.game)];
+            out.println("<html><head>");
+            out.println("<style>");
+            out.println("label> input { visibility: hidden; position: absolute;}");
+            out.println("label> input + img{ cursor:pointer; border:2px solid transparent; height: 50px;}");
+            out.println("label> input:not(:checked):hover + img{ border:5px solid transparent; }");
+            out.println("label> input:checked + img{ height: 75px;}");
+            out.println("td{ width: 140px; height: 100px; text-align: center;}");
+            out.println("</style></head><body>");
+            int index = randInt(0,rps.game*100+99)/100;
+            String comp = rps.general[index];
             int outcome = getOutcome(user,comp);
             out.println("<h1>OUTCOME: "+outcome+"</h1>");
             out.println("<p>Match was:"+user+" VS "+comp+"</p>");
             out.println("<br>");
             if (outcome == 1) {
+                rps.userScore++;
                 out.println("YOU WIN");
             } else if (outcome == 0) {
                 out.println("ITS A DRAW");
             } else if (outcome == -1) {
+                rps.compScore++;
                 out.println("YOU LOSE");
 
             } else {
                 out.println("ERROR");
             }
+
+            out.println("<br>");
+            out.println("<p>Score:</p><br>");
+            out.println("<p>Player: "+rps.userScore+" Computer: "+rps.compScore+"</p>");
             //TODO: FIX LABEL (CSS)
             // TODO: CREATE TABLE STRUCTURE
             // TODO: INTEGRATE GIF ANIMATION
             // TODO: CHANGE RANDOM METHOD TO CHANGE ODDS (GET NUMBER FROM 0-300, 0-500 0-700)
             printExplanation(out,rps.game);
             out.println("<form method=\"POST\">");
+            out.println("<input type=\"checkbox\" name=\"reset\">Reset?<br>");
             out.println("<label>");
             out.println("<input type=\"submit\"/>");
-            out.println("<img src=\"img/buttons/start.png\">");
+            out.println("<img src=\"img/buttons/start.gif\">");
             out.println("</label>");
             out.println("</form>");
             out.println("</body></html>");
