@@ -1,0 +1,74 @@
+import java.awt.image.BufferedImage;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileOutputStream;
+import javax.imageio.ImageIO;
+import javax.swing.Timer;
+
+import net.jmge.gif.Gif89Encoder;
+
+
+public class Anim{
+
+
+	static void drawFrame(Graphics2D g, int frame,BufferedImage img){
+		g.setColor(Color.white);
+		g.fillRect(0,0,1000,500);
+		g.drawImage(img, 12*frame+400, 50, null);
+
+		
+
+	}
+	
+	
+
+
+	public static void main(String [] argv){
+		Timer tm = new Timer(5, null);
+		int time = 0;
+		int x = 0, velX = 2;
+		int yPosition = 0;
+		boolean goingDown = true;
+		
+		BufferedImage img = null;
+		BufferedImage img2 = null;
+		
+		
+
+		
+		try {
+			Gif89Encoder genc = new Gif89Encoder();
+			img = ImageIO.read(new File("Scissors.gif"));
+			img2 = ImageIO.read(new File("Rock.gif"));
+
+			BufferedImage image = new BufferedImage(800,400, BufferedImage.TYPE_INT_ARGB);
+			//BufferedImage image2 = new BufferedImage(1000,400, BufferedImage.TYPE_INT_ARGB);
+			
+			
+			
+			while(x<450){
+				
+				Graphics2D g = img.createGraphics();
+				//drawFrame(g,-i+20,img);
+				g = image.createGraphics();
+				g.setColor(Color.white);
+				g.fillRect(0, 0, 800, 400);
+				g.drawImage(img,x-100,0,null);
+				g.drawImage(img2,800-x,0,null);
+				genc.addFrame(image);
+				g.dispose();
+				
+				x = x + 6*velX;
+			}
+			
+
+			genc.setUniformDelay(5);
+			genc.setLoopCount(0);
+			FileOutputStream out = new FileOutputStream("anim.gif");
+			genc.encode(out);
+		}catch(Exception e){
+			System.err.println(e);
+		}
+	}
+}
