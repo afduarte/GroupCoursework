@@ -36,49 +36,28 @@ public class Servlet extends HttpServlet {
             String user = request.getParameter("symbol");
             response.setContentType("text/html");
             PrintWriter out = response.getWriter();
-            out.println("<html><head>");
-            out.println("<style>");
-            out.println("label> input { visibility: hidden; position: absolute;}");
-            out.println("label> input + img{ cursor:pointer; border:2px solid transparent; height: 50px;}");
-            out.println("label> input:not(:checked):hover + img{ border:5px solid transparent; }");
-            out.println("label> input:checked + img{ height: 75px;}");
-            out.println("td{ width: 140px; height: 100px; text-align: center;}");
-            out.println("</style></head><body>");
             int index = randInt(0,rps.game*100+99)/100;
             String comp = rps.general[index];
             int outcome = getOutcome(user,comp);
-            out.println("<h1>OUTCOME: "+outcome+"</h1>");
-            out.println("<p>Match was:"+user+" VS "+comp+"</p>");
-            out.println("<br>");
             if (outcome == 1) {
                 rps.userScore++;
-                out.println("YOU WIN");
+                Anim.getGif(user,comp,outcome);
             } else if (outcome == 0) {
-                out.println("ITS A DRAW");
+                Anim.getGif(user,comp,outcome);
             } else if (outcome == -1) {
                 rps.compScore++;
-                out.println("YOU LOSE");
+                Anim.getGif(user,comp,outcome);
 
             } else {
                 out.println("ERROR");
             }
-
-            out.println("<br>");
-            out.println("<p>Score:</p><br>");
-            out.println("<p>Player: "+rps.userScore+" Computer: "+rps.compScore+"</p>");
-            //TODO: FIX LABEL (CSS)
+            printResult(out,rps);
+            // TODO: FIX LABEL (CSS)
             // TODO: CREATE TABLE STRUCTURE
             // TODO: INTEGRATE GIF ANIMATION
-            // TODO: CHANGE RANDOM METHOD TO CHANGE ODDS (GET NUMBER FROM 0-300, 0-500 0-700)
+
             printExplanation(out,rps.game);
-            out.println("<form method=\"POST\">");
-            out.println("<input type=\"checkbox\" name=\"reset\">Reset?<br>");
-            out.println("<label>");
-            out.println("<input type=\"submit\"/>");
-            out.println("<img src=\"img/buttons/start.gif\">");
-            out.println("</label>");
-            out.println("</form>");
-            out.println("</body></html>");
+
 
 
 
@@ -208,6 +187,47 @@ public class Servlet extends HttpServlet {
             out.println("<font color=\"5555ff\"><b>AIR</b></font> BLOWS OUT <font color=\"dddd00\"><b>FIRE</b></font>, ERODES <font color=\"00bb00\"><b>ROCK</b></font>, EVAPORATES <font color=\"0000bb\"><b>WATER</b></font>.<br>");
             out.println("</p>");
         }
+    }
+
+    public void printResult(PrintWriter out, RPS rps) {
+        out.println("<html>");
+        out.println("<head>");
+        out.println("<title>Rock, Paper, Scissors Extreme</title>");
+        out.println("<style>");
+        out.println("label> input { visibility: hidden; position: absolute;}");
+        out.println("label> input + img{ cursor:pointer; border:2px solid transparent; height: 50px;}");
+        out.println("label> input:not(:checked):hover + img{ border:5px solid transparent; }");
+        out.println("label> input:checked + img{ height: 75px;}");
+        out.println("td{ width: 140px; height: 100px; text-align: center;}");
+        out.println("</style>");
+        out.println("</head>");
+        out.println("<body>");
+        out.println("<table align=\"center\">");
+        out.println("<thead><th><h1>Fight</h1></th></thead>");
+        out.println("<tbody>");
+        out.println("<tr>");
+        out.println("<td>");
+        out.println("<img src=\"img/anim.gif\">");
+        out.println("</td>");
+        out.println("</tr>");
+        out.println("<tr>");
+        out.println("<td>");
+        out.println("<p>Score:</p><p>Player: "+rps.userScore+" Computer: "+rps.compScore+"</p>");
+        out.println("</td>");
+        out.println("</tr>");
+        out.println("<tr>");
+        out.println("<td>");
+        out.println("<form method=\"POST\">");
+        out.println("<input type=\"checkbox\" name=\"reset\">Reset?<br>");
+        out.println("<label>");
+        out.println("<input type=\"submit\"/>");
+        out.println("<img src=\"img/buttons/start.gif\">");
+        out.println("</label>");
+        out.println("</form>");
+        out.println("</tbody>");
+        out.println("</table>");
+        out.println("</body>");
+        out.println("</html>");
     }
 
 
