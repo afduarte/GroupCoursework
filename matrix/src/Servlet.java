@@ -15,12 +15,12 @@ public class Servlet extends HttpServlet {
         Integer limit;
         Integer interval;
         String error = "";
-        Color fgColor;
+        Color fgColor = new Color(Integer.parseInt("00FF00",16));
         Color bgColor;
-        Boolean variableIntensity = false;
+        Boolean variableJam = false;
         Boolean variableSize = false;
+        Boolean dispIterations = false;
         request.setAttribute("error", error);
-        SafeColor checkColor = new SafeColor();
 
         if (null != word) {
             if (word.isEmpty()) {
@@ -58,22 +58,6 @@ public class Servlet extends HttpServlet {
                 set = "abcdefghijklmnopqrstuvwxyz";
             }
 
-            if(null == request.getParameter("fgColor"))
-            {
-                fgColor = new Color(Integer.parseInt(request.getParameter("00FF00"),16));
-
-            } else {
-
-                try
-                {
-                    fgColor = new Color(Integer.parseInt(request.getParameter("fgColor"),16));
-                }
-                catch(java.lang.NumberFormatException e)
-                {
-                    fgColor = new Color(Integer.parseInt(request.getParameter("00FF00"),16));
-                }
-            }
-
             if(null == request.getParameter("bgColor"))
             {
                 bgColor = Color.black;
@@ -94,23 +78,29 @@ public class Servlet extends HttpServlet {
                 set = word + word + set + word + word;
             }
 
-            if(Boolean.valueOf(request.getParameter("varsize"))){
+            if (Boolean.valueOf(request.getParameter("iters"))) {
+                dispIterations = true;
+            }
+
+            if( "0".equals(request.getParameter("radios"))){
+                variableSize = false;
+                variableJam = false;
+            }
+
+            if( "1".equals(request.getParameter("radios"))){
                 variableSize = true;
+                variableJam = false;
             }
 
-            if(Boolean.valueOf(request.getParameter("varint"))){
-                variableIntensity = true;
+            if( "2".equals(request.getParameter("radios"))){
+                variableSize = false;
+                variableJam = true;
             }
-
-
-
 
             if (! error.equals("")) {
                 request.getRequestDispatcher("/form.jsp").forward(request, response);
             } else {
-                Matrix matrix = new Matrix(set, rows, columns, fgColor, bgColor,variableSize,
-                        variableIntensity && checkColor.isSafe(request.getParameter("fgColor"))
-                        && checkColor.isSafe(request.getParameter("bgColor")));
+                Matrix matrix = new Matrix(set, rows, columns, fgColor, bgColor,variableSize, variableJam,dispIterations);
                 response.setContentType("image/gif");
                 matrix.findWord(word, limit, interval).encode(response.getOutputStream());
             }

@@ -1,6 +1,7 @@
 import net.jmge.gif.Gif89Encoder;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,11 +17,15 @@ public class Matrix {
     Color bg;
     Color font;
     Color highlight;
-    Boolean variableSize = true;
-    Boolean variableIntensity = true;
+    Boolean variableSize;
+    Boolean charJam;
+    Boolean displayIterations;
+    Font defFont;
+    Font matrixFont = null;
+    Font matrixCode = null;
 
-    public Matrix(String chars, Integer rows, Integer cols,
-                  Color fgColor, Color bgColor, Boolean variableSize, Boolean variableIntensity) {
+    public Matrix(String chars, Integer rows, Integer cols, Color fgColor,
+                  Color bgColor, Boolean variableSize, Boolean charJam, Boolean displayIterations) {
         this.charSet = chars.toCharArray();
         this.rows = rows;
         this.cols = cols;
@@ -28,7 +33,25 @@ public class Matrix {
         this.font = fgColor;
         this.highlight = Color.white;
         this.variableSize = variableSize;
-        this.variableIntensity = variableIntensity;
+        this.charJam = charJam;
+        this.defFont = new Font(Font.MONOSPACED, Font.PLAIN, 16);
+        this.displayIterations = displayIterations;
+        try {
+            this.matrixFont = Font.createFont(Font.TRUETYPE_FONT,
+                    new File("C:\\Users\\Elohimir\\Documents\\GitHub\\SD1-GCW\\matrix\\web\\matrixFont.ttf")); //TODO fix this shit
+        } catch (FontFormatException | IOException e) {
+            matrixFont = new Font(Font.MONOSPACED,Font.PLAIN,16);
+            e.printStackTrace();
+        }
+        matrixFont = matrixFont.deriveFont(16f);
+        try {
+            this.matrixCode = Font.createFont(Font.TRUETYPE_FONT,
+                    new File("C:\\Users\\Elohimir\\Documents\\GitHub\\SD1-GCW\\matrix\\web\\matrix-code.ttf")); //TODO fix this shit
+        } catch (FontFormatException | IOException e) {
+            matrixCode = new Font(Font.MONOSPACED,Font.PLAIN,16);
+            e.printStackTrace();
+        }
+        matrixCode = matrixCode.deriveFont(16f);
     }
 
     public Gif89Encoder findWord(String word, Integer limit, Integer interval) throws IOException{
@@ -40,7 +63,7 @@ public class Matrix {
         Integer width = this.cols * 16 + 2*16;
         Integer height = (this.rows+1) * 20 + 2*5;
         String powResult = getExponential(word.length(),charSet.length);
-        Font defFont = new Font(Font.MONOSPACED, Font.PLAIN, 16);
+
         ArrayList<Integer> indexes = new ArrayList<>();
 
         IntStream.range(1,this.cols+1).forEach(x -> indexes.add(x));
@@ -55,7 +78,7 @@ public class Matrix {
                     RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
             g.setColor(this.bg);
             g.fillRect(0,0,width, height);
-            g.setFont(defFont);
+            g.setFont(this.defFont);
             this.drawIntro(g,j,indexes);
             genc.addFrame(image);
             g.dispose();
@@ -70,8 +93,11 @@ public class Matrix {
             g.setColor(this.bg);
             g.fillRect(0,0,width, height);
             g.setColor(this.font);
-            g.setFont(defFont);
-            found = this.drawFrame(g, word, i++,defFont);
+            g.setFont(this.defFont);
+            found = this.drawFrame(g, word, i++);
+            if(found)
+                for(Integer j = 0; j < 25; j++)
+                    genc.addFrame(image);
             genc.addFrame(image);
             g.dispose();
         }
@@ -84,11 +110,11 @@ public class Matrix {
             g.setColor(this.bg);
             g.fillRect(0,0,width, height);
             g.setColor(this.font);
-            g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
             g.drawString(" Could not find a result in " + limit + " iterations.", 0,20);
             g.drawString(" The chances of finding a word of length "+word.length(),0, 80);
-            g.drawString(" with an alphabet of size "+this.charSet.length+" are only 1 on " + powResult,0, 100);
+            g.drawString(" with an alphabet of size "+this.charSet.length+" are only 1 in " + powResult,0, 100);
             genc.addFrame(image);
+            g.dispose();
         }
 
         genc.setUniformDelay(interval);
@@ -97,22 +123,8 @@ public class Matrix {
         return genc;
     }
 
-    private Color getRandomColorBrightness(Color color) {
-        Integer r = new Random().nextInt(3);
 
-        if (r.equals(0)) {
-            return color;
-        }
-
-        if (r.equals(1)) {
-            return color.brighter();
-        }
-
-        return color.darker();
-    }
-
-
-    private Boolean drawFrame(Graphics2D g, String highlight, Integer iteration,Font defFont) {
+    private Boolean drawFrame(Graphics2D g, String highlight, Integer iteration) {
         Boolean found = false;
         for (Integer row = 1; row <= this.rows; row++) {
             g.translate(0, 20);
@@ -122,17 +134,20 @@ public class Matrix {
             for (Integer col = 0; col < line.length(); col++) {
                 if (startHighlight != -1 && !found && startHighlight <= col && endHighlight > col) {
                     g.setColor(this.highlight);
-                    g.setFont(defFont);
+                    g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 24));
                 } else {
-                    if(variableIntensity)
-                        g.setColor(this.getRandomColorBrightness(this.font));
-                    else
-                        g.setColor(this.font);
+                    g.setColor(this.font);
                     if(this.variableSize)
+                    {
                         g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, randomSize(15,5)));
+                    }
+                    if(this.charJam)
+                    {
+                        randomFont(g);
+                    }
                 }
                 g.drawString(String.valueOf(line.charAt(col)), (col+1)*16, 0);
-
+                g.setFont(this.defFont);
             }
 
             if (! startHighlight.equals(-1)) {
@@ -141,9 +156,12 @@ public class Matrix {
         }
         g.translate(0, 20);
 
-        g.setColor(this.font);
-        g.setFont(defFont);
-        g.drawString("Iteration:" + iteration, 0, 0);
+        if(displayIterations)
+        {
+            g.setColor(this.font);
+            g.setFont(this.defFont);
+            g.drawString("Iteration:" + iteration+1, 0, 0);
+        }
         return found;
     }
 
@@ -175,13 +193,14 @@ public class Matrix {
             g.translate(i*16,0);
             for(Integer j = 1; j<iterations; j++)
             {
-
                 g.setColor(Color.green);
                 String entry = "" + charSet[randomSize(this.charSet.length,0)];
                 if(this.variableSize)
-                    g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, randomSize(15,5)));
-                if(variableIntensity)
-                    g.setColor(this.getRandomColorBrightness(this.font));
+                    g.setFont(new Font("matrixCode", Font.PLAIN, randomSize(15,5)));
+                if(this.charJam)
+                    g.setFont(this.matrixCode);
+                if(j == iterations || j == iterations -1)
+                    g.setColor(Color.white);
                 g.drawString(entry,0,0);
                 g.translate(0,20);
             }
@@ -189,4 +208,12 @@ public class Matrix {
         }
     }
 
+    void randomFont(Graphics2D g)
+    {
+        Integer temp = randomSize(2,0);
+        if(temp == 0)
+            g.setFont(this.matrixCode);
+        else
+            g.setFont(this.matrixFont);
+    }
 }

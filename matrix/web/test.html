@@ -56,16 +56,16 @@
 
         <%! public Integer getColumnSize(String word)
         {
-            if(word == null)
-                return 1;
-            else
-                return word.length();
+        if(word == null)
+        return 1;
+        else
+        return word.length();
         }%>
         <div id="sizes">
             <label for="cols">Columns:</label>
             <br>
             <input type="number" min="<%= getColumnSize(request.getParameter("word")+1)%>"
-                   max="150" name="cols" id="cols" required value="40" size = "10">
+            max="150" name="cols" id="cols" required value="40" size = "10">
             <br>
             <label for="rows">Rows:</label>
             <br>
@@ -102,11 +102,11 @@
             <label for="cheat">Cheat?</label>
             <input type="checkbox" name="cheat" id="cheat" value="true">
             <br>
-            <label for="standard">Standard Text</label>
-            <input type="radio" name="radios" id="standard" value="0" checked>
-            <label for="varsize">Variable Char Size</label>
+            <label for="standard">Character Jam?</label>
+            <input type="radio" name="radios" id="standard" value="0">
+            <label for="varsize">Variable Size?</label>
             <input type="radio" name="radios" id="varsize" value="1">
-            <label for="varJam">Character Jam</label>
+            <label for="varJam">Character Jam?</label>
             <input type="radio" name="radios" id="varJam" value="2">
             <br><br>
         </div>

@@ -1,7 +1,12 @@
 
 @font-face {
-	font-family: MATRIX;
-    src: url("MATRIX.ttf");
+	font-family: TITLE;
+    src: url("milt.ttf");
+}
+
+@font-face {
+    font-family: MATRIX;
+    src: url("matrixFont.ttf");
 }
 
 body{
@@ -17,6 +22,7 @@ label{
 }
 
 h1{
+    font-family: TITLE;
     color: limegreen;
     text-shadow: 0 0 10px lawngreen;
     text-align: center;
