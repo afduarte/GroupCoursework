@@ -10,6 +10,7 @@ public class Servlet extends HttpServlet {
 
         String word = request.getParameter("word");
         String set;
+        Integer originalSetSize;
         Integer columns;
         Integer rows;
         Integer limit;
@@ -60,6 +61,7 @@ public class Servlet extends HttpServlet {
             if (null == set) {
                 set = "abcdefghijklmnopqrstuvwxyz";
             }
+            originalSetSize = set.length();
 
             if(null == request.getParameter("bgColor"))
             {
@@ -78,7 +80,8 @@ public class Servlet extends HttpServlet {
             }
 
             if (Boolean.valueOf(request.getParameter("cheat"))) {
-                set = word + word + set + word + word;
+                for(Integer i = 0; i < word.length()*5; i++)
+                    set += word;
             }
 
             if (Boolean.valueOf(request.getParameter("iters"))) {
@@ -114,7 +117,7 @@ public class Servlet extends HttpServlet {
                 request.getRequestDispatcher("/form.jsp").forward(request, response);
             } else {
                 Matrix matrix = new Matrix(set, rows, columns, fgColor, bgColor,variableSize,
-                        variableJam,dispIterations,dispIntro,dispOutro,dispResults);
+                        variableJam,dispIterations,dispIntro,dispOutro,dispResults, originalSetSize);
                 response.setContentType("image/gif");
                 matrix.findWord(word, limit, interval).encode(response.getOutputStream());
             }

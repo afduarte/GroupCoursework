@@ -14,6 +14,7 @@ public class Matrix {
     char[] charSet;
     Integer rows;
     Integer cols;
+    Integer alphabetSize;
     Color bg;
     Color font;
     Color highlight;
@@ -29,10 +30,11 @@ public class Matrix {
 
     public Matrix(String chars, Integer rows, Integer cols, Color fgColor, Color bgColor,
                   Boolean variableSize, Boolean charJam, Boolean displayIterations, Boolean intro,
-                  Boolean outro, Boolean results) {
+                  Boolean outro, Boolean results, Integer alphabetSize) {
         this.charSet = chars.toCharArray();
         this.rows = rows;
         this.cols = cols;
+        this.alphabetSize = alphabetSize;
         this.bg = bgColor;
         this.font = fgColor;
         this.highlight = Color.white;
@@ -69,7 +71,8 @@ public class Matrix {
         Integer i = 0;
         Integer width = this.cols * 16 + 2*16;
         Integer height = (this.rows+1) * 20 + 2*5;
-        String powResult = getExponential(word.length(),charSet.length);
+        Double powResult = getExponential(word.length(),charSet.length);
+        Integer attempts = ((cols-word.length())*rows*limit);
 
         ArrayList<Integer> indexes = new ArrayList<>();
 
@@ -123,6 +126,7 @@ public class Matrix {
                 g.setColor(this.bg);
                 g.fillRect(0,0,width, height);
                 g.setFont(this.defFont);
+                Collections.shuffle(indexes);
                 this.drawInOut(g,j,indexes,height,-20);
                 genc.addFrame(image);
                 g.dispose();
@@ -143,17 +147,19 @@ public class Matrix {
                 g.setFont(matrixFont);
                 g.drawString("SORRY!",(cols*8)-30,40);
                 g.setFont(defFont);
-                g.drawString(" Could not find a result in " + limit + " iterations.", 70,110);
+                g.drawString(" Could not find a result in " + limit + " iterations.", 20,110);
             }
             else
             {
                 g.setFont(matrixFont);
                 g.drawString("FOUND!",(cols*8)-30,40);
                 g.setFont(defFont);
-                g.drawString(" Result found in " + limit + " iterations.", 70,110);
+                g.drawString(" Result found in " + limit + " iterations.", 20,110);
             }
-            g.drawString(" The chances to generate the word '" + word + "' of length "+word.length(),70, 150);
-            g.drawString(" with an alphabet of size "+this.charSet.length+" are only 1 in " + powResult,70, 190);
+            g.drawString(" The chances to generate the word '" + word + "' of length "+word.length(),20, 150);
+            g.drawString(" with an alphabet of size "+alphabetSize+" are only 1 in " + powResult,20, 190);
+            g.drawString(" We have tried to find your word "+attempts+" times.", 20, 230);
+            g.drawString(" The chances of finding your word were  "+findProbabilty(attempts,powResult)+".", 20, 270);
             genc.addFrame(image);
             g.dispose();
         }
@@ -215,10 +221,9 @@ public class Matrix {
         return line;
     }
 
-    String getExponential(Integer exp, Integer base)
+    Double getExponential(Integer exp, Integer base)
     {
-            Double res = pow(base,exp);
-            return res.toString()+"!";
+            return pow(base,exp);
     }
 
     Integer randomSize(Integer value, Integer offset)
@@ -261,5 +266,16 @@ public class Matrix {
             g.setFont(this.matrixCode);
         else
             g.setFont(this.matrixFont);
+    }
+
+    Double findProbabilty(Integer att, Double chance)
+    {
+        Double probability;
+        Double attempts = (double)att;
+        probability = attempts/chance;
+        if(probability > 1d)
+            return 1d;
+        return probability;
+
     }
 }
