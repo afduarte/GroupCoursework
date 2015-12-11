@@ -4,10 +4,15 @@ public class RPS {
     public int game;
     public int userScore;
     public int compScore;
+    public String user="";
+    public String comp;
+    public int outcome;
 
     public void reset() {
         this.userScore = 0;
         this.compScore = 0;
+        this.user ="";
+        this.comp="";
     }
 
     public RPS(){

@@ -1,7 +1,12 @@
+import net.jmge.gif.Gif89Encoder;
+import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Random;
@@ -11,6 +16,8 @@ public class Servlet extends HttpServlet {
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         rps.game=0;
+        rps.user="";
+        rps.comp="";
         if(request.getParameter("reset")!=null)
             rps.reset();
         response.sendRedirect("Servlet");
@@ -22,7 +29,7 @@ public class Servlet extends HttpServlet {
             response.setContentType("text/html");
             PrintWriter out = response.getWriter();
             printIndex(out);
-        }else if(request.getParameter("symbol")==null){
+        }else if(rps.user.equals("") && request.getParameter("symbol")==null){
 
             if(request.getParameter("game")!=null)
                 rps.game = Integer.parseInt(request.getParameter("game"));
@@ -33,35 +40,33 @@ public class Servlet extends HttpServlet {
             printMove(out, symbols, rps.game);
 
         }else if(rps.game!=0 && request.getParameter("symbol")!=null){
-            String user = request.getParameter("symbol");
+            rps.user = request.getParameter("symbol");
+            int index = randInt(0,rps.game*100+99)/100;
+            rps.comp=rps.general[index];
+            rps.outcome = getOutcome(rps.user,rps.comp);
+
+            //response.setContentType("image/gif");
+
+            if (rps.outcome == 1) {
+                rps.userScore++;
+                //getGif(user, comp, outcome).encode(response.getOutputStream());
+            } else if (rps.outcome == 0) {
+                //getGif(user, comp, outcome).encode(response.getOutputStream());
+            } else if (rps.outcome == -1) {
+                rps.compScore++;
+                //getGif(user, comp, outcome).encode(response.getOutputStream());
+            } else{}
+
             response.setContentType("text/html");
             PrintWriter out = response.getWriter();
-            int index = randInt(0,rps.game*100+99)/100;
-            String comp = rps.general[index];
-            int outcome = getOutcome(user,comp);
-            if (outcome == 1) {
-                rps.userScore++;
-                Anim.getGif(user,comp,outcome);
-            } else if (outcome == 0) {
-                Anim.getGif(user,comp,outcome);
-            } else if (outcome == -1) {
-                rps.compScore++;
-                Anim.getGif(user,comp,outcome);
-
-            } else {
-                out.println("ERROR");
-            }
-            printResult(out,rps);
-            // TODO: FIX LABEL (CSS)
-            // TODO: CREATE TABLE STRUCTURE
-            // TODO: INTEGRATE GIF ANIMATION
-
+            printResult(out,rps.userScore,rps.compScore);
             printExplanation(out,rps.game);
 
-
-
-
+        }else if(rps.game!=0 && request.getParameter("img")!=null) {
+            response.setContentType("image/gif");
+            getGif(rps.user, rps.comp, rps.outcome).encode(response.getOutputStream());
         }
+
     }
 
     public void printIndex(PrintWriter out) {
@@ -189,7 +194,7 @@ public class Servlet extends HttpServlet {
         }
     }
 
-    public void printResult(PrintWriter out, RPS rps) {
+    public void printResult(PrintWriter out, int userScore, int compScore) {
         out.println("<html>");
         out.println("<head>");
         out.println("<title>Rock, Paper, Scissors Extreme</title>");
@@ -198,6 +203,7 @@ public class Servlet extends HttpServlet {
         out.println("label> input + img{ cursor:pointer; border:2px solid transparent; height: 50px;}");
         out.println("label> input:not(:checked):hover + img{ border:5px solid transparent; }");
         out.println("label> input:checked + img{ height: 75px;}");
+        out.println("#gif{ width: 700px;}");
         out.println("td{ width: 140px; height: 100px; text-align: center;}");
         out.println("</style>");
         out.println("</head>");
@@ -207,12 +213,12 @@ public class Servlet extends HttpServlet {
         out.println("<tbody>");
         out.println("<tr>");
         out.println("<td>");
-        out.println("<img src=\"img/anim.gif\">");
+        out.println("<img id=\"gif\" src=\"Servlet?img=\"yes\"\"/>");
         out.println("</td>");
         out.println("</tr>");
         out.println("<tr>");
         out.println("<td>");
-        out.println("<p>Score:</p><p>Player: "+rps.userScore+" Computer: "+rps.compScore+"</p>");
+        out.println("<p>Score:</p><p>Player: "+userScore+" Computer: "+compScore+"</p>");
         out.println("</td>");
         out.println("</tr>");
         out.println("<tr>");
@@ -291,4 +297,122 @@ public class Servlet extends HttpServlet {
                 return 0;
         }
     }
+
+    public Gif89Encoder getGif(String user, String comp, int outcome){
+
+        int time = 0;
+        int x = 0, velX = 2;
+        int yPosition = 0;
+        boolean goingDown = true;
+
+        BufferedImage img = null;
+        BufferedImage img2 = null;
+        BufferedImage img3 = null;
+
+
+
+
+
+        try {
+            Gif89Encoder genc = new Gif89Encoder();
+            img = ImageIO.read(new File("/home/antero/SD1/GroupCoursework/rps/web/img/symbols/"+user + ".gif"));
+            //System.out.println(getClass().getResourceAsStream("/img/symbols/"+user+".gif"));
+            //img = ImageIO.read(getClass().getResourceAsStream("/img/symbols/"+user+".gif"));
+            img2 = ImageIO.read(new File("/home/antero/SD1/GroupCoursework/rps/web/img/symbols/"+comp + ".gif"));
+            //img2 = ImageIO.read(getClass().getResourceAsStream("/img/symbols/"+comp+".gif"));
+            img3 = ImageIO.read(new File("/home/antero/SD1/GroupCoursework/rps/web/img/buttons/expl.gif"));
+            //img3 = ImageIO.read(getClass().getResourceAsStream("/img/buttons/expl.gif"));
+
+
+
+            BufferedImage image = new BufferedImage(1000,280, BufferedImage.TYPE_INT_ARGB);
+
+
+
+            while(time<200){
+                if(time<38){
+                    Graphics2D g = image.createGraphics();
+                    g.setColor(Color.WHITE);
+                    g.fillRect(0, 0, 1000, 300);
+                    g.drawImage(img,x-100,yPosition+40,null);
+                    g.drawImage(img2,1000-x,yPosition+40,null);
+                    genc.addFrame(image);
+                    g.dispose();
+
+
+                }else if(time > 45 && time < 55){
+                    Graphics2D g = image.createGraphics();
+                    g.drawImage(img3,320,15,null);
+                    genc.addFrame(image);
+                    g.dispose();
+                }else if(time > 55 && time < 70){
+                    Graphics2D g = image.createGraphics();
+                    g.fillRect(0, 0, 1000, 280);
+                    genc.addFrame(image);
+                    g.dispose();
+                }else if(time > 70 && time < 200){
+                    Graphics2D g = image.createGraphics();
+                    g.fillRect(0, 0, 1000, 280);
+                    BufferedImage outcomeImg;
+
+                    if(outcome == 1)
+                        outcomeImg = ImageIO.read(new File("/home/antero/SD1/GroupCoursework/rps/web/img/buttons/win.gif"));
+                        //outcomeImg = ImageIO.read(getClass().getResource("img/buttons/win.gif"));
+                    else if(outcome == 0)
+                        outcomeImg = ImageIO.read(new File("/home/antero/SD1/GroupCoursework/rps/web/img/buttons/draw.gif"));
+                        //outcomeImg = ImageIO.read(getClass().getResource("img/buttons/draw.gif"));
+                    else if(outcome == -1)
+                        outcomeImg = ImageIO.read(new File("/home/antero/SD1/GroupCoursework/rps/web/img/buttons/lose.gif"));
+                        //outcomeImg = ImageIO.read(getClass().getResource("img/buttons/lose.gif"));
+                    else
+                        throw new Exception("ERROR in outcome");
+
+                    g.drawImage(outcomeImg,380,yPosition-20,null);
+                    genc.addFrame(image);
+                    g.dispose();
+                }
+
+                x = x + 7*velX;
+                time++;
+
+
+
+
+                //up and down movement
+                if (goingDown == true){
+                    if (yPosition <= 0){
+                        goingDown = false;
+                        yPosition= yPosition+4;
+                    }
+                    else {
+                        yPosition= yPosition-4;;
+                    }
+                }
+                else {
+                    // if we're going up and we reach 0, go down again
+                    if (yPosition >= 50){
+                        goingDown = true;
+                        yPosition= yPosition-4;;
+                    }
+                    else {
+                        yPosition= yPosition+4;;
+                    }
+                }
+            }
+
+
+
+            genc.setUniformDelay(5);
+            genc.setLoopCount(0);
+            //FileOutputStream out = new FileOutputStream("/usr/share/tomcat7/bin/anim.gif");
+            //genc.encode(out);
+            return genc;
+        }catch(Exception e){
+            System.err.println(e);
+        }
+        return null;
+    }
+
+
+
 }
