@@ -117,6 +117,7 @@ public class Matrix {
 
         if(outro)
         {
+            Collections.shuffle(indexes);
             for(Integer j = this.cols; j >0; j--)
             {
                 BufferedImage image = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
@@ -126,7 +127,6 @@ public class Matrix {
                 g.setColor(this.bg);
                 g.fillRect(0,0,width, height);
                 g.setFont(this.defFont);
-                Collections.shuffle(indexes);
                 this.drawInOut(g,j,indexes,height,-20);
                 genc.addFrame(image);
                 g.dispose();
