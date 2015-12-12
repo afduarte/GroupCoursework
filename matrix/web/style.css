@@ -1,0 +1,86 @@
+
+@font-face {
+	font-family: TITLE;
+    src: url("milt.ttf");
+}
+
+@font-face {
+    font-family: MATRIX;
+    src: url("matrixFont.ttf");
+}
+
+body{
+    background: #cccccc url("pill.jpg");
+    font-family: MATRIX;
+}
+
+label{
+    color: limegreen;
+    text-shadow: 0 0 10px lawngreen;
+    font-weight: bold;
+    line-height: 200%;
+}
+
+h1{
+    font-family: TITLE;
+    color: limegreen;
+    text-shadow: 0 0 10px lawngreen;
+    text-align: center;
+}
+    
+h3{
+    color: red;
+    text-shadow: 0 0 10px orangered;
+    text-align: center;
+}
+
+p{
+    color: limegreen;
+    text-shadow: 0 0 10px lawngreen;
+}
+
+#main{
+    position: relative;
+    left: 250px;
+}
+
+#sizes{
+    position: absolute;
+    top: 215px;
+    left: 175px;
+}
+
+#limits{
+    position: absolute;
+    top: 215px;
+    left: 280px;
+}
+
+#colors{
+    position: absolute;
+    top: 215px;
+}
+
+#checkbox{
+    position: absolute;
+    top: 355px;
+}
+
+#button{
+    border-color: darkred;
+    background-color: darkred;
+    position: absolute;
+    top: 570px;
+    left: 250px;
+}
+
+input:hover{
+    background-color: green;
+}
+
+
+
+
+
+
+
