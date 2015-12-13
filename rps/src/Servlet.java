@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Servlet extends HttpServlet {
@@ -29,40 +30,53 @@ public class Servlet extends HttpServlet {
             response.setContentType("text/html");
             PrintWriter out = response.getWriter();
             printIndex(out);
+            rps.newGame();
         }else if(rps.user.equals("") && request.getParameter("symbol")==null){
 
             if(request.getParameter("game")!=null)
                 rps.game = Integer.parseInt(request.getParameter("game"));
 
-            String[] symbols = new String[rps.game];
-            System.arraycopy(rps.general, 0, symbols, 0, rps.game);
+            rps.symbols.add("rock");
+            rps.symbols.add("paper");
+            rps.symbols.add("scissors");
+
+            if (rps.game >= 5) {
+                rps.symbols.add("fire");
+                rps.symbols.add("water");
+            }
+
+            if (rps.game == 7) {
+                rps.symbols.add("sponge");
+                rps.symbols.add("air");
+
+            }
+
+
             PrintWriter out = response.getWriter();
-            printMove(out, symbols, rps.game);
+            printMove(out, rps.symbols, rps.game);
 
         }else if(rps.game!=0 && request.getParameter("symbol")!=null){
             rps.user = request.getParameter("symbol");
-            int index = randInt(0,rps.game*100+99)/100;
-            rps.comp=rps.general[index];
+            int index = randInt(0,(rps.game*100+99)/100);
+            rps.comp= rps.symbols.get(index);
             rps.outcome = getOutcome(rps.user,rps.comp);
-
-            //response.setContentType("image/gif");
 
             if (rps.outcome == 1) {
                 rps.userScore++;
-                //getGif(user, comp, outcome).encode(response.getOutputStream());
-            } else if (rps.outcome == 0) {
-                //getGif(user, comp, outcome).encode(response.getOutputStream());
             } else if (rps.outcome == -1) {
                 rps.compScore++;
-                //getGif(user, comp, outcome).encode(response.getOutputStream());
-            } else{}
+            } else{
+                System.out.println("Error in outcome");
+            }
 
             response.setContentType("text/html");
             PrintWriter out = response.getWriter();
             printResult(out,rps.userScore,rps.compScore);
             printExplanation(out,rps.game);
 
-        }else if(rps.game!=0 && request.getParameter("img")!=null) {
+        }
+
+        if(rps.game!=0 && request.getParameter("img")!=null) {
             response.setContentType("image/gif");
             getGif(rps.user, rps.comp, rps.outcome).encode(response.getOutputStream());
         }
@@ -121,7 +135,7 @@ public class Servlet extends HttpServlet {
         out.println("</html>");
     }
 
-    public void printMove(PrintWriter out, String[] symbols, int game) {
+    public void printMove(PrintWriter out, ArrayList<String> symbols, int game) {
         out.println("<html>");
         out.println("<head>");
         out.println("<title>Rock, Paper, Scissors Extreme</title>");
@@ -187,7 +201,7 @@ public class Servlet extends HttpServlet {
             out.println("<font color=\"purple\"><b>PAPER</b></font> FANS <font color=\"5555ff\"><b>AIR</b></font>, COVERS <font color=\"00bb00\"><b>ROCK</b></font>, FLOATS ON <font color=\"0000bb\"><b>WATER</b></font>.<br>");
             out.println("<font color=\"brown\"><b>SCISSORS</b></font> SWISH THROUGH <font color=\"5555ff\"><b>AIR</b></font>, CUT <font color=\"purple\"><b>PAPER</b></font> &amp; <font color=\"ff5555\"><b>SPONGE</b></font>.<br>");
             out.println("<font color=\"dddd00\"><b>FIRE</b></font> MELTS <font color=\"brown\"><b>SCISSORS</b></font>, BURNS <font color=\"purple\"><b>PAPER</b></font> &amp; <font color=\"ff5555\"><b>SPONGE</b></font>.<br>");
-            out.println("<font color=\"0000bb\"><b>WATER</b></font> ERODES <font color=\"00bb00\"><b>ROCK</b></font>, PUTS OUT<font color=\"dddd00\"><b>FIRE</b></font>, RUSTS <font color=\"brown\"><b>SCISSORS</b></font>.");
+            out.println("<font color=\"0000bb\"><b>WATER</b></font> ERODES <font color=\"00bb00\"><b>ROCK</b></font>, PUTS OUT<font color=\"dddd00\"><b>FIRE</b></font>, RUSTS <font color=\"brown\"><b>SCISSORS</b></font>.<br>");
             out.println("<font color=\"ff5555\"><b>SPONGE</b></font> SOAKS <font color=\"purple\"><b>PAPER</b></font>, USES <font color=\"5555ff\"><b>AIR</b></font> POCKETS, ABSORBS <font color=\"0000bb\"><b>WATER</b></font>.<br>");
             out.println("<font color=\"5555ff\"><b>AIR</b></font> BLOWS OUT <font color=\"dddd00\"><b>FIRE</b></font>, ERODES <font color=\"00bb00\"><b>ROCK</b></font>, EVAPORATES <font color=\"0000bb\"><b>WATER</b></font>.<br>");
             out.println("</p>");
@@ -316,12 +330,12 @@ public class Servlet extends HttpServlet {
         try {
             Gif89Encoder genc = new Gif89Encoder();
             img = ImageIO.read(new File("/home/antero/SD1/GroupCoursework/rps/web/img/symbols/"+user + ".gif"));
-            //System.out.println(getClass().getResourceAsStream("/img/symbols/"+user+".gif"));
-            //img = ImageIO.read(getClass().getResourceAsStream("/img/symbols/"+user+".gif"));
+
+
             img2 = ImageIO.read(new File("/home/antero/SD1/GroupCoursework/rps/web/img/symbols/"+comp + ".gif"));
-            //img2 = ImageIO.read(getClass().getResourceAsStream("/img/symbols/"+comp+".gif"));
+
             img3 = ImageIO.read(new File("/home/antero/SD1/GroupCoursework/rps/web/img/buttons/expl.gif"));
-            //img3 = ImageIO.read(getClass().getResourceAsStream("/img/buttons/expl.gif"));
+
 
 
 
